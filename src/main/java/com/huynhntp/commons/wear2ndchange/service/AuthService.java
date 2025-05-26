@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -80,14 +81,32 @@ public class AuthService {
         }
     }
 
-    private void createPasswordResetToken(Account account, String token) {
-        PasswordResetToken prt = new PasswordResetToken();
-        prt.setToken(token);
-        prt.setAccount(account);
-        prt.setExpiryDate(LocalDateTime.now().plusMinutes(30));
-        passwordResetTokenRepository.save(prt);
+    @Transactional
+    public boolean createPasswordResetToken(Account account, String token) {
+        boolean shouldCreateToken = passwordResetTokenRepository.findByAccountId(account.getId())
+                .map(existingToken -> {
+                    if (existingToken.isExpired()) {
+                        passwordResetTokenRepository.deleteByAccount_Id(existingToken.getAccount().getId());
+                        passwordResetTokenRepository.flush();
+                        return true;
+                    }
+                    return false;
+                })
+                .orElse(true);
+
+        if (shouldCreateToken) {
+            PasswordResetToken prt = new PasswordResetToken();
+            prt.setToken(token);
+            prt.setAccount(account);
+            prt.setExpiryDate(LocalDateTime.now().plusMinutes(30));
+            passwordResetTokenRepository.save(prt);
+            return true;
+        }
+
+        return false;
     }
 
+    @Transactional
     public void forgotPassword(ForgotPasswordForm forgotPasswordForm) {
         Optional<Account> userOpt = accountRepository.findByEmail(forgotPasswordForm.getEmail());
         if (userOpt.isEmpty()) {
@@ -97,12 +116,17 @@ public class AuthService {
         Account user = userOpt.get();
         String token = UUID.randomUUID().toString();
 
-        createPasswordResetToken(user, token);
+        boolean passwordResetToken = createPasswordResetToken(user, token);
 
-        String resetLink = "http://localhost:8080/api/auth/reset?token=" + token;
-        Msg msg = new Msg().setMsgUser(
-                        new Account().setEmail(user.getEmail()))
-                .setParams(Map.of("link", resetLink));
-        msgService.send(msg);
+        if (passwordResetToken) {
+            String resetLink = "http://localhost:8080/api/auth/reset?token=" + token;
+            Msg msg = new Msg().setMsgUser(
+                            new Account().setEmail(user.getEmail()))
+                    .setParams(Map.of("link", resetLink));
+            msgService.send(msg);
+        } else {
+            throw new BusinessException("Check your email to get password");
+        }
+
     }
 }
