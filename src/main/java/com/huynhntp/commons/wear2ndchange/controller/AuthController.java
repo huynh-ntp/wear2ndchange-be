@@ -1,15 +1,14 @@
 package com.huynhntp.commons.wear2ndchange.controller;
 
-import com.huynhntp.commons.wear2ndchange.infra.mail.*;
 import com.huynhntp.commons.wear2ndchange.model.dto.*;
-import com.huynhntp.commons.wear2ndchange.model.entity.Account;
-import com.huynhntp.commons.wear2ndchange.repository.AccountRepository;
 import com.huynhntp.commons.wear2ndchange.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 
 @RestController
@@ -41,5 +40,12 @@ public class AuthController {
         authService.forgotPassword(request);
 
         return ResponseEntity.ok("Reset password link sent to your email.");
+    }
+
+    @GetMapping("/reset-password/{token}")
+    public ResponseEntity<?> resetPassword(@PathVariable String token) {
+        authService.resetPassword(UUID.fromString(token));
+
+        return ResponseEntity.ok("Reset password successfully!");
     }
 }

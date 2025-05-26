@@ -119,14 +119,21 @@ public class AuthService {
         boolean passwordResetToken = createPasswordResetToken(user, token);
 
         if (passwordResetToken) {
-            String resetLink = "http://localhost:8080/api/auth/reset?token=" + token;
+            String resetLink = "http://45.119.82.37:8080/api/auth/reset-password?token=" + token;
             Msg msg = new Msg().setMsgUser(
                             new Account().setEmail(user.getEmail()))
-                    .setParams(Map.of("link", resetLink));
+                    .setParams(Map.of(
+                            "link", resetLink,
+                            "emailTo", user.getEmail())
+                    );
             msgService.send(msg);
         } else {
             throw new BusinessException("Check your email to get password");
         }
+    }
+
+    @Transactional
+    public void resetPassword(UUID token) {
 
     }
 }
