@@ -4,13 +4,11 @@ import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
 import com.huynhntp.commons.wear2ndchange.config.jwt.JwtUtils;
 import com.huynhntp.commons.wear2ndchange.config.jwt.TokenBlacklist;
 import com.huynhntp.commons.wear2ndchange.config.security.UserDetails;
+import com.huynhntp.commons.wear2ndchange.infra.mail.*;
 import com.huynhntp.commons.wear2ndchange.mapper.AccountMapper;
-import com.huynhntp.commons.wear2ndchange.model.dto.AccountDTO;
-import com.huynhntp.commons.wear2ndchange.model.dto.LoginRequest;
-import com.huynhntp.commons.wear2ndchange.model.dto.LoginResponse;
-import com.huynhntp.commons.wear2ndchange.model.dto.RegisterRequest;
-import com.huynhntp.commons.wear2ndchange.model.entity.Account;
-import com.huynhntp.commons.wear2ndchange.repository.AccountRepository;
+import com.huynhntp.commons.wear2ndchange.model.dto.*;
+import com.huynhntp.commons.wear2ndchange.model.entity.*;
+import com.huynhntp.commons.wear2ndchange.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -29,6 +30,8 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final TokenBlacklist tokenBlacklist;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final MsgService msgService;
 
     public AccountDTO registerUser(RegisterRequest registerRequest, HttpServletRequest request) {
         if (accountRepository.existsByUsername(registerRequest.getUsername())) {
@@ -38,6 +41,8 @@ public class AuthService {
         Account newAccount = new Account();
         newAccount.setUsername(registerRequest.getUsername());
         newAccount.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        newAccount.setEmail(registerRequest.getEmail());
+        newAccount.setPhoneNumber(registerRequest.getPhoneNumber());
         newAccount.setRole(registerRequest.getRole() != null ? registerRequest.getRole() : "USER");
 
         accountRepository.save(newAccount);
@@ -69,5 +74,31 @@ public class AuthService {
             String jwt = authHeader.substring(7);
             tokenBlacklist.addToBlacklist(jwt);
         }
+    }
+
+    private void createPasswordResetToken(Account account, String token) {
+        PasswordResetToken prt = new PasswordResetToken();
+        prt.setToken(token);
+        prt.setAccount(account);
+        prt.setExpiryDate(LocalDateTime.now().plusMinutes(30));
+        passwordResetTokenRepository.save(prt);
+    }
+
+    public void forgotPassword(ForgotPasswordForm forgotPasswordForm) {
+        Optional<Account> userOpt = accountRepository.findByEmail(forgotPasswordForm.getEmail());
+        if (userOpt.isEmpty()) {
+            throw new BusinessException("email not found");
+        }
+
+        Account user = userOpt.get();
+        String token = UUID.randomUUID().toString();
+
+        createPasswordResetToken(user, token);
+
+        String resetLink = "http://localhost:8080/api/auth/reset?token=" + token;
+        Msg msg = new Msg().setMsgUser(
+                        new Account().setEmail(user.getEmail()))
+                .setParams(Map.of("link", resetLink));
+        msgService.send(msg);
     }
 }

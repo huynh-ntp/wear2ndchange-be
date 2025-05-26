@@ -1,18 +1,24 @@
 package com.huynhntp.commons.wear2ndchange.model.entity;
 
+import com.huynhntp.commons.wear2ndchange.infra.mail.MsgUser;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.experimental.Accessors;
+import org.hibernate.annotations.*;
+import org.hibernate.type.SqlTypes;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Map;
 
 @Data
 @Entity
 @Table(name = "accounts")
-public class Account  {
+@Accessors(chain = true)
+public class Account  implements MsgUser {
+
+    private final String ACTIVE = "ACTIVE";
+    private final String INACTIVE = "INACTIVE";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,7 +29,19 @@ public class Account  {
     @Column(nullable = false)
     private String password;
 
+    @Column(unique = true, nullable = false)
+    private String phoneNumber;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
     @Column(nullable = false)
     private String role;
 
+    @Column(nullable = false)
+    private String status = ACTIVE;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> preference;
 }
