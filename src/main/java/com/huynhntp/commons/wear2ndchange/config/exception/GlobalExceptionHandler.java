@@ -16,8 +16,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException ex) {
-        return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Authentication Failed",
+                "Tài khoản hoặc mật khẩu không đúng",
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
@@ -25,7 +32,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleGeneralException(Exception ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Business exception",
+                "System Error",
                 ex.getMessage(),
                 request.getRequestURI(),
                 LocalDateTime.now()
@@ -50,7 +57,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<?> handleLoginErr(BusinessException ex, HttpServletRequest request) {
+    public ResponseEntity<?> handleLoginErr(UsernameNotFoundException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Business exception",

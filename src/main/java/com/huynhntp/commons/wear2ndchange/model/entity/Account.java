@@ -15,8 +15,9 @@ import java.util.Map;
 @Table(name = "accounts")
 @Accessors(chain = true)
 public class Account  implements MsgUser {
-
+    @Transient
     private final String ACTIVE = "ACTIVE";
+    @Transient
     private final String INACTIVE = "INACTIVE";
 
     @Id
@@ -29,7 +30,6 @@ public class Account  implements MsgUser {
     @Column(nullable = false)
     private String password;
 
-    @Column(unique = true, nullable = false)
     private String phoneNumber;
 
     @Column(unique = true, nullable = false)

@@ -38,6 +38,10 @@ public class AuthService {
             throw new BusinessException("Tài khoản đã tồn tại");
         }
 
+        if (accountRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new BusinessException("Email đã tồn tại");
+        }
+
         Account newAccount = new Account();
         newAccount.setUsername(registerRequest.getUsername());
         newAccount.setPassword(passwordEncoder.encode(registerRequest.getPassword()));

@@ -10,6 +10,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Optional<Account> findByUsername(String username);
 
+    boolean existsByEmail(String email);
+
     @Query("SELECT a FROM Account a where a.status = 'ACTIVE'")
     Optional<Account> findByEmail(String email);
 }
