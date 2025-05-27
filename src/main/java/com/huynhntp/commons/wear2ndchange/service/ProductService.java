@@ -25,12 +25,6 @@ public class ProductService {
 
     @Transactional
     public void createProduct(ProductForm productForm, MultipartFile[] images) {
-        String uploadDir = "/home/ubuntu/uploads/";
-        File dir = new File(uploadDir);
-        if (!dir.exists() && !dir.mkdirs()) {
-            throw new RuntimeException("Could not create upload directory");
-        }
-
         Account account = accountRepository.findById(authService.getUserId())
                 .orElseThrow(() -> new BusinessException("Account not found"));
 
@@ -41,6 +35,12 @@ public class ProductService {
                 .setPrice(productForm.getPrice())
                 .setStatus(productForm.getStatus())
                 .setCreateBy(account);
+
+        String uploadDir = "/home/ubuntu/uploads/";
+        File dir = new File(uploadDir);
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw new RuntimeException("Could not create upload directory");
+        }
 
         List<ProductImage> imageEntities = new ArrayList<>();
 
