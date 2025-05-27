@@ -1,12 +1,12 @@
 package com.huynhntp.commons.wear2ndchange.model.entity;
 
+import com.huynhntp.commons.wear2ndchange.common.UtilsService;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -30,10 +30,29 @@ public class Product {
 
     private Long price;
 
+    private String searchText;
+
+    private void updateSearchText() {
+        if (name != null && !name.isEmpty()) {
+            this.searchText = UtilsService.removeAccents(name);
+        }
+    }
+
+    @PrePersist
+    private void prePersist() {
+        updateSearchText();
+    }
+
+    @PreUpdate
+    private void preUpdate() {
+        updateSearchText();
+    }
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account createBy;
+
 }
