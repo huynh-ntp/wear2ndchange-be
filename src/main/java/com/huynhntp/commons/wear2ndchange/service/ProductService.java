@@ -33,7 +33,7 @@ public class ProductService {
                 .setSize(productForm.getSize())
                 .setMaterial(productForm.getMaterial())
                 .setPrice(productForm.getPrice())
-                .setStatus(productForm.getStatus())
+                .setPercentage(productForm.getPercentage())
                 .setCreateBy(account);
 
         String uploadDir = "/home/ubuntu/uploads/";

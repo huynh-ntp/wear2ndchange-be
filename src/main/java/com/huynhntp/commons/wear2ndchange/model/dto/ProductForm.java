@@ -19,4 +19,6 @@ public class ProductForm {
     private String category;
 
     private Long price;
+
+    private String status = "ACTIVE";
 }
