@@ -1,11 +1,13 @@
 package com.huynhntp.commons.wear2ndchange.service;
 
 import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
+import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
 import com.huynhntp.commons.wear2ndchange.mapper.ProductMapper;
 import com.huynhntp.commons.wear2ndchange.model.dto.*;
 import com.huynhntp.commons.wear2ndchange.model.entity.*;
 import com.huynhntp.commons.wear2ndchange.repository.*;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +23,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final AuthService authService;
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+    private final ProductImageRepository productImageRepository;
 
     @Transactional
     public void createProduct(ProductForm productForm, MultipartFile[] images) {
@@ -34,6 +37,7 @@ public class ProductService {
                 .setMaterial(productForm.getMaterial())
                 .setPrice(productForm.getPrice())
                 .setPercentage(productForm.getPercentage())
+                .setCategory(productForm.getCategory().toString())
                 .setCreateBy(account);
 
         String uploadDir = "/home/ubuntu/uploads/";
@@ -60,7 +64,7 @@ public class ProductService {
                     Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
                     ProductImage imageEntity = new ProductImage();
-                    imageEntity.setUrl("/uploads/" + safeFilename);
+                    imageEntity.setUrl("http://45.119.82.37:8080/" + safeFilename);
                     imageEntity.setProduct(product);
                     imageEntities.add(imageEntity);
 
@@ -75,6 +79,28 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    @Transactional(readOnly = true)
+    public Page<ProductDTO> getProducts(String name, CategoryEnum category, Pageable pageable) {
+        String categoryStr = category != null ? category.name() : null;
+        Page<Product> products = productRepository.searchByNameAndCategory(name, categoryStr, pageable);
 
+        List<ProductDTO> productDTOS = new ArrayList<>();
+        products.forEach(product -> {
+            List<ProductImage> productImages = productImageRepository.findByProductId(product.getId());
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setId(product.getId());
+            productDTO.setSize(product.getSize());
+            productDTO.setMaterial(product.getMaterial());
+            productDTO.setName(product.getName());
+            productDTO.setCategory(product.getCategory());
+            productDTO.setPrice(product.getPrice());
+            productDTO.setStatus(product.getStatus());
+            productDTO.setPercentage(product.getPercentage());
+            productDTO.setImages(productImages);
+            productDTOS.add(productDTO);
+        });
+
+        return new PageImpl<>(productDTOS, pageable, products.getTotalElements());
+    }
 
 }

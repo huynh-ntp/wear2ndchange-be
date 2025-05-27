@@ -1,11 +1,14 @@
 package com.huynhntp.commons.wear2ndchange.model.dto;
 
+import com.huynhntp.commons.wear2ndchange.model.entity.ProductImage;
 import lombok.*;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductResponse {
+public class ProductDTO {
     private Long id;
 
     private String name;
@@ -22,5 +25,5 @@ public class ProductResponse {
 
     private String status;
 
-    private String[] imagesUrl;
+    private List<ProductImage> images;
 }

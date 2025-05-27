@@ -1,8 +1,10 @@
 package com.huynhntp.commons.wear2ndchange.controller;
 
-import com.huynhntp.commons.wear2ndchange.model.dto.ProductForm;
+import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
+import com.huynhntp.commons.wear2ndchange.model.dto.*;
 import com.huynhntp.commons.wear2ndchange.service.ProductService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/product")
 @AllArgsConstructor
-//@CrossOrigin(origins = "*")
 public class ProductController {
 
     private final ProductService productService;
@@ -22,6 +23,13 @@ public class ProductController {
 
         productService.createProduct(productForm, images);
         return ResponseEntity.ok("saved successfully");
+    }
+
+    @GetMapping
+    public Page<ProductDTO> getAllProducts(@RequestParam(required = false) String name,
+                                           @RequestParam(required = false) CategoryEnum category,
+                                           Pageable pageable) {
+        return productService.getProducts(name, category, pageable);
     }
 
 }

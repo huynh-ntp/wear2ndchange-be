@@ -1,5 +1,6 @@
 package com.huynhntp.commons.wear2ndchange.model.dto;
 
+import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -16,7 +17,7 @@ public class ProductForm {
 
     private String percentage;
 
-    private String category;
+    private CategoryEnum category;
 
     private Long price;
 

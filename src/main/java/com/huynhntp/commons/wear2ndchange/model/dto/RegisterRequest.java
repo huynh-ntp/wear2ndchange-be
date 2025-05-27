@@ -1,6 +1,5 @@
 package com.huynhntp.commons.wear2ndchange.model.dto;
 
-import com.huynhntp.commons.wear2ndchange.model.entity.Account;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

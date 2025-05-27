@@ -1,6 +1,8 @@
 package com.huynhntp.commons.wear2ndchange.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.huynhntp.commons.wear2ndchange.common.UtilsService;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
