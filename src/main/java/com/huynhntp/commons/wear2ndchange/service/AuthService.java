@@ -57,6 +57,22 @@ public class AuthService {
         return accountMapper.toDto(newAccount);
     }
 
+    public Long getUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No authenticated user found");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUserId();
+        }
+
+        return null;
+    }
+
     public LoginResponse login(LoginRequest loginRequest, HttpServletRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -123,7 +139,7 @@ public class AuthService {
         boolean passwordResetToken = createPasswordResetToken(user, token);
 
         if (passwordResetToken) {
-            String resetLink = "http://localhost:8080/api/auth/reset-password?token=" + token;
+            String resetLink = "http://45.119.82.37:8080/api/auth/reset-password?token=" + token;
             Msg msg = new Msg().setMsgUser(
                             new Account().setEmail(user.getEmail()))
                     .setParams(Map.of(
