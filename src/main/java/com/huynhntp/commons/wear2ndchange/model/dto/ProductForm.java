@@ -14,7 +14,9 @@ public class ProductForm {
 
     private String material;
 
-    private String status;
+    private String percentage;
+
+    private String category;
 
     private Long price;
 }

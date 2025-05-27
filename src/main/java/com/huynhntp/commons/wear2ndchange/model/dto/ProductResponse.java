@@ -14,9 +14,13 @@ public class ProductResponse {
 
     private String material;
 
-    private String status;
+    private String percentage;
+
+    private String category;
 
     private Long price;
+
+    private String status;
 
     private String[] imagesUrl;
 }

@@ -32,6 +32,8 @@ public class Product {
 
     private String searchText;
 
+    private String category;
+
     private void updateSearchText() {
         if (name != null && !name.isEmpty()) {
             this.searchText = UtilsService.removeAccents(name);
