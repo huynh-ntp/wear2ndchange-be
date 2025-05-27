@@ -6,17 +6,18 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
 
     private String username;
     private String password;
+    private Long userId;
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetails(Account account) {
         username = account.getUsername();
         password = account.getPassword();
+        userId = account.getId();
         authorities = Arrays.stream(new String[]{account.getRole()})
                 .map(SimpleGrantedAuthority::new).toList();
     }
@@ -34,6 +35,10 @@ public class UserDetails implements org.springframework.security.core.userdetail
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     @Override

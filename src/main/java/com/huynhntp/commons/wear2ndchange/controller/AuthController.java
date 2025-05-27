@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 
 @RestController
 @RequestMapping("/api/auth")
@@ -42,9 +40,9 @@ public class AuthController {
         return ResponseEntity.ok("Reset password link sent to your email.");
     }
 
-    @GetMapping("/reset-password/{token}")
-    public ResponseEntity<?> resetPassword(@PathVariable String token) {
-        authService.resetPassword(UUID.fromString(token));
+    @GetMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String token) {
+        authService.resetPassword(token);
 
         return ResponseEntity.ok("Reset password successfully!");
     }

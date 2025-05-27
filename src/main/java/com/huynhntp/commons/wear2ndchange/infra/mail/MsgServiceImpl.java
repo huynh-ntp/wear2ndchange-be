@@ -16,11 +16,27 @@ class MsgServiceImpl implements MsgService {
     @Override
     public void send(Msg msg) {
         SimpleMailMessage message = new SimpleMailMessage();
+        switch (msg.getParams().get("template").toString()) {
+            case "reset": resetPasswordTemplate(message, msg);
+            break;
+            case "sendNewPassword": sendNewPasswordTemplate(message, msg);
+            break;
+        }
+
+        mailSender.send(message);
+    }
+
+    public void resetPasswordTemplate(SimpleMailMessage message, Msg msg) {
         message.setFrom(msg.getMsgUser().getEmail());
         message.setTo(msg.getParams().get("emailTo").toString());
         message.setSubject("Reset Password");
         message.setText(msg.getParams().get("link").toString());
+    }
 
-        mailSender.send(message);
+    public void sendNewPasswordTemplate(SimpleMailMessage message, Msg msg) {
+        message.setFrom(msg.getMsgUser().getEmail());
+        message.setTo(msg.getParams().get("emailTo").toString());
+        message.setSubject("New Password");
+        message.setText(msg.getParams().get("password").toString());
     }
 }

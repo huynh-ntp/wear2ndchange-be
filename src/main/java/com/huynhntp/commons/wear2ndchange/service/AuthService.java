@@ -1,5 +1,6 @@
 package com.huynhntp.commons.wear2ndchange.service;
 
+import com.huynhntp.commons.wear2ndchange.common.PasswordGenerator;
 import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
 import com.huynhntp.commons.wear2ndchange.config.jwt.JwtUtils;
 import com.huynhntp.commons.wear2ndchange.config.jwt.TokenBlacklist;
@@ -25,6 +26,7 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class AuthService {
+
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountMapper accountMapper;
@@ -48,6 +50,7 @@ public class AuthService {
         newAccount.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         newAccount.setEmail(registerRequest.getEmail());
         newAccount.setPhoneNumber(registerRequest.getPhoneNumber());
+        newAccount.setFullName(registerRequest.getFullName());
         newAccount.setRole(registerRequest.getRole() != null ? registerRequest.getRole() : "USER");
 
         accountRepository.save(newAccount);
@@ -70,6 +73,7 @@ public class AuthService {
         return new LoginResponse(
                 jwt,
                 userDetails.getUsername(),
+                userDetails.getUserId(),
                 userDetails.getAuthorities().stream().findFirst().orElseThrow(() -> new BusinessException("User has no assigned role")).getAuthority());
     }
 
@@ -119,10 +123,11 @@ public class AuthService {
         boolean passwordResetToken = createPasswordResetToken(user, token);
 
         if (passwordResetToken) {
-            String resetLink = "http://45.119.82.37:8080/api/auth/reset-password?token=" + token;
+            String resetLink = "http://localhost:8080/api/auth/reset-password?token=" + token;
             Msg msg = new Msg().setMsgUser(
                             new Account().setEmail(user.getEmail()))
                     .setParams(Map.of(
+                            "template", "reset",
                             "link", resetLink,
                             "emailTo", user.getEmail())
                     );
@@ -133,7 +138,25 @@ public class AuthService {
     }
 
     @Transactional
-    public void resetPassword(UUID token) {
+    public void resetPassword(String token) {
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or expired password reset token"));
 
+        Account account = accountRepository.findById(passwordResetToken.getAccount().getId())
+                .orElseThrow(() -> new IllegalStateException("Associated account not found"));
+
+        String randomPass = PasswordGenerator.generate();
+        String newPassword = passwordEncoder.encode(randomPass);
+        account.setPassword(newPassword);
+        accountRepository.save(account);
+
+        Msg msg = new Msg().setMsgUser(new Account().setEmail(account.getEmail()))
+                .setParams(Map.of(
+                        "template", "sendNewPassword",
+                        "password", randomPass,
+                        "emailTo", account.getEmail()
+                ));
+
+        msgService.send(msg);
     }
 }

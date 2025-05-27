@@ -32,6 +32,8 @@ public class Account  implements MsgUser {
 
     private String phoneNumber;
 
+    private String fullName;
+
     @Column(unique = true, nullable = false)
     private String email;
 
