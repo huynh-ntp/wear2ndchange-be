@@ -64,7 +64,7 @@ public class ProductService {
                     Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
                     ProductImage imageEntity = new ProductImage();
-                    imageEntity.setUrl("http://45.119.82.37:8080/" + safeFilename);
+                    imageEntity.setUrl("http://45.119.82.37:8080/uploads/" + safeFilename);
                     imageEntity.setProduct(product);
                     imageEntities.add(imageEntity);
 
