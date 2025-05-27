@@ -24,6 +24,8 @@ public class Product {
 
     private String material;
 
+    private String percentage;
+
     private String status;
 
     private Long price;

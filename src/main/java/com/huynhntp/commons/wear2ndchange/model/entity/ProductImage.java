@@ -13,6 +13,8 @@ public class ProductImage {
 
     private String url;
 
+    private Boolean isMainImage;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
