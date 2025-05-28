@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
                                 "https://wear2ndchange-fe.vercel.app",
                                 "http://localhost:3000"
                         )
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
