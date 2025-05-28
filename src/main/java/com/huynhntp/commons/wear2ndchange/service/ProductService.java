@@ -64,6 +64,9 @@ public class ProductService {
 
         List<ProductImage> newImageEntities = saveImages(newImages, product, uploadDir, domainUrl);
 
+        productImageRepository.deleteByProductId(productId);
+        productImageRepository.flush();
+
         product.getImages().addAll(newImageEntities);
 
         productRepository.save(product);

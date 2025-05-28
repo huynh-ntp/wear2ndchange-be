@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/account")
 @AllArgsConstructor
-//@CrossOrigin(origins = "*")
 public class AccountController {
 
     private final AccountService accountService;
@@ -19,5 +18,11 @@ public class AccountController {
     @GetMapping("/profile")
     public AccountDTO resetPassword(@RequestParam Long userId) {
         return accountService.viewProfile(userId);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        accountService.changePassword(request);
+        return ResponseEntity.ok("Password changed successfully");
     }
 }
