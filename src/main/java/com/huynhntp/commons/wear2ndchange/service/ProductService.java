@@ -7,6 +7,7 @@ import com.huynhntp.commons.wear2ndchange.mapper.ProductMapper;
 import com.huynhntp.commons.wear2ndchange.model.dto.*;
 import com.huynhntp.commons.wear2ndchange.model.entity.*;
 import com.huynhntp.commons.wear2ndchange.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class ProductService {
     private final AuthService authService;
     private final AccountRepository accountRepository;
     private final ProductImageRepository productImageRepository;
+    private final ProductMapper productMapper;
 
     @Transactional
     public void createProduct(ProductForm productForm, MultipartFile[] images) {
@@ -117,7 +119,12 @@ public class ProductService {
         productRepository.delete(product);
     }
 
+    public ProductDTO getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
+        return productMapper.toDto(product);
+    }
 
     private List<ProductImage> saveImages(MultipartFile[] images, Product product, String uploadDir, String domainUrl) {
         List<ProductImage> imageEntities = new ArrayList<>();
