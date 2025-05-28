@@ -17,7 +17,7 @@ public class ProductForm {
 
     private String percentage;
 
-    private CategoryEnum category;
+    private String category;
 
     private Long price;
 

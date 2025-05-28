@@ -3,6 +3,7 @@ package com.huynhntp.commons.wear2ndchange.model.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.huynhntp.commons.wear2ndchange.common.UtilsService;
 
+import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -34,7 +35,8 @@ public class Product {
 
     private String searchText;
 
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private CategoryEnum category;
 
     private void updateSearchText() {
         if (name != null && !name.isEmpty()) {

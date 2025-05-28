@@ -1,5 +1,8 @@
 package com.huynhntp.commons.wear2ndchange.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
 import com.huynhntp.commons.wear2ndchange.model.dto.*;
 import com.huynhntp.commons.wear2ndchange.service.ProductService;
@@ -16,14 +19,17 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping()
     public ResponseEntity<?> createProduct(
-            @ModelAttribute("productForm") ProductForm productForm,
-            @ModelAttribute("images") MultipartFile[] images) {
+            @RequestParam("productForm") String productFormStr,
+            @RequestParam("images") MultipartFile[] images) throws JsonProcessingException {
 
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        ProductForm productForm = mapper.readValue(productFormStr, ProductForm.class);
         productService.createProduct(productForm, images);
 
-        return ResponseEntity.ok("saved successfully");
+        return ResponseEntity.ok("Đăng bán thành công.");
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

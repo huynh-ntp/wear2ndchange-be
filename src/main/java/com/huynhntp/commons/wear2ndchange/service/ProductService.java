@@ -4,19 +4,33 @@ import com.huynhntp.commons.wear2ndchange.config.exception.AccessDeniedException
 import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
 import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
 import com.huynhntp.commons.wear2ndchange.mapper.ProductMapper;
-import com.huynhntp.commons.wear2ndchange.model.dto.*;
-import com.huynhntp.commons.wear2ndchange.model.entity.*;
-import com.huynhntp.commons.wear2ndchange.repository.*;
+import com.huynhntp.commons.wear2ndchange.model.dto.ProductDTO;
+import com.huynhntp.commons.wear2ndchange.model.dto.ProductForm;
+import com.huynhntp.commons.wear2ndchange.model.entity.Account;
+import com.huynhntp.commons.wear2ndchange.model.entity.Product;
+import com.huynhntp.commons.wear2ndchange.model.entity.ProductImage;
+import com.huynhntp.commons.wear2ndchange.repository.AccountRepository;
+import com.huynhntp.commons.wear2ndchange.repository.ProductImageRepository;
+import com.huynhntp.commons.wear2ndchange.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -39,7 +53,7 @@ public class ProductService {
                 .setMaterial(productForm.getMaterial())
                 .setPrice(productForm.getPrice())
                 .setPercentage(productForm.getPercentage())
-                .setCategory(productForm.getCategory().toString())
+                .setCategory(CategoryEnum.parseStringToEnum(productForm.getCategory()))
                 .setCreateBy(account);
 
         String uploadDir = "/home/ubuntu/uploads/";
@@ -54,12 +68,12 @@ public class ProductService {
     public void updateProduct(Long productId, ProductForm productForm, MultipartFile[] newImages) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException("Product not found"));
-        product.setName(productForm.getName());
-        product.setSize(productForm.getSize());
-        product.setMaterial(productForm.getMaterial());
-        product.setPrice(productForm.getPrice());
-        product.setPercentage(productForm.getPercentage());
-        product.setCategory(productForm.getCategory().toString());
+        product.setName(productForm.getName())
+                .setSize(productForm.getSize())
+                .setMaterial(productForm.getMaterial())
+                .setPrice(productForm.getPrice())
+                .setPercentage(productForm.getPercentage())
+                .setCategory(CategoryEnum.parseStringToEnum(productForm.getCategory()));
 
         String uploadDir = "/home/ubuntu/uploads/";
         String domainUrl = "http://45.119.82.37:8080";
@@ -88,7 +102,7 @@ public class ProductService {
             productDTO.setSize(product.getSize());
             productDTO.setMaterial(product.getMaterial());
             productDTO.setName(product.getName());
-            productDTO.setCategory(product.getCategory());
+            productDTO.setCategory(product.getCategory().toString());
             productDTO.setPrice(product.getPrice());
             productDTO.setStatus(product.getStatus());
             productDTO.setPercentage(product.getPercentage());
