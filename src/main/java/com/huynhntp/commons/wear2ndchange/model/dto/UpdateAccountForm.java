@@ -9,4 +9,5 @@ public class UpdateAccountForm {
     private String phoneNumber;
     private String email;
     private String avatarUrl;
+    private String address;
 }

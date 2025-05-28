@@ -58,11 +58,7 @@ public class AccountService {
         Account account = accountRepository.findById(currentUserId)
                 .orElseThrow(() -> new BusinessException("Account not found"));
 
-        account.setFullName(form.getFullName());
-        account.setPhoneNumber(form.getPhoneNumber());
-        account.setEmail(form.getEmail());
-        account.setAvatarUrl(form.getAvatarUrl());
-
+        accountMapper.updateAccountFromForm(form, account);
         accountRepository.save(account);
     }
 

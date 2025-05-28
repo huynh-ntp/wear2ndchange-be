@@ -28,7 +28,7 @@ public class AccountController {
         return ResponseEntity.ok("Password changed successfully");
     }
 
-    @PutMapping()
+    @PatchMapping
     public ResponseEntity<?> updateAccount(@RequestBody UpdateAccountForm form) {
         accountService.updateAccount(form);
         return ResponseEntity.ok("Account updated successfully");
