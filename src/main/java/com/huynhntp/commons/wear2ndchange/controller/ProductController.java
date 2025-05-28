@@ -22,6 +22,17 @@ public class ProductController {
             @ModelAttribute("images") MultipartFile[] images) {
 
         productService.createProduct(productForm, images);
+
+        return ResponseEntity.ok("saved successfully");
+    }
+
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateProduct(
+            @ModelAttribute("productId") Long productId,
+            @ModelAttribute("productForm") ProductForm productForm,
+            @ModelAttribute("images") MultipartFile[] images) {
+        productService.updateProduct(productId, productForm, images);
+
         return ResponseEntity.ok("saved successfully");
     }
 

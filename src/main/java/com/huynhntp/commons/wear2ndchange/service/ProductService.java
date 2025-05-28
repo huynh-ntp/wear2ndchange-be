@@ -41,43 +41,34 @@ public class ProductService {
                 .setCreateBy(account);
 
         String uploadDir = "/home/ubuntu/uploads/";
-        File dir = new File(uploadDir);
-        if (!dir.exists() && !dir.mkdirs()) {
-            throw new RuntimeException("Could not create upload directory");
-        }
-
-        List<ProductImage> imageEntities = new ArrayList<>();
-
-        for (MultipartFile image : images) {
-            if (!image.isEmpty()) {
-                try {
-                    String originalFilename = Paths.get(Objects.requireNonNull(image.getOriginalFilename())).getFileName().toString();
-                    String extension = "";
-
-                    int dotIndex = originalFilename.lastIndexOf('.');
-                    if (dotIndex >= 0) {
-                        extension = originalFilename.substring(dotIndex);
-                    }
-
-                    String safeFilename = UUID.randomUUID() + extension;
-                    Path filePath = Paths.get(uploadDir, safeFilename);
-                    Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                    ProductImage imageEntity = new ProductImage();
-                    imageEntity.setUrl("http://45.119.82.37:8080/uploads/" + safeFilename);
-                    imageEntity.setProduct(product);
-                    imageEntities.add(imageEntity);
-
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to save image", e);
-                }
-            }
-        }
-
+        String domainUrl = "http://45.119.82.37:8080";
+        List<ProductImage> imageEntities = saveImages(images, product, uploadDir, domainUrl);
         product.setImages(imageEntities);
 
         productRepository.save(product);
     }
+
+    @Transactional
+    public void updateProduct(Long productId, ProductForm productForm, MultipartFile[] newImages) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BusinessException("Product not found"));
+        product.setName(productForm.getName());
+        product.setSize(productForm.getSize());
+        product.setMaterial(productForm.getMaterial());
+        product.setPrice(productForm.getPrice());
+        product.setPercentage(productForm.getPercentage());
+        product.setCategory(productForm.getCategory().toString());
+
+        String uploadDir = "/home/ubuntu/uploads/";
+        String domainUrl = "http://45.119.82.37:8080";
+
+        List<ProductImage> newImageEntities = saveImages(newImages, product, uploadDir, domainUrl);
+
+        product.getImages().addAll(newImageEntities);
+
+        productRepository.save(product);
+    }
+
 
     @Transactional(readOnly = true)
     public Page<ProductDTO> getProducts(String name, CategoryEnum category, Pageable pageable) {
@@ -101,6 +92,45 @@ public class ProductService {
         });
 
         return new PageImpl<>(productDTOS, pageable, products.getTotalElements());
+    }
+
+
+    private List<ProductImage> saveImages(MultipartFile[] images, Product product, String uploadDir, String domainUrl) {
+        List<ProductImage> imageEntities = new ArrayList<>();
+
+        File dir = new File(uploadDir);
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw new RuntimeException("Could not create upload directory");
+        }
+
+        for (MultipartFile image : images) {
+            if (!image.isEmpty()) {
+                try {
+                    String originalFilename = Paths.get(Objects.requireNonNull(image.getOriginalFilename()))
+                            .getFileName().toString();
+                    String extension = "";
+
+                    int dotIndex = originalFilename.lastIndexOf('.');
+                    if (dotIndex >= 0) {
+                        extension = originalFilename.substring(dotIndex);
+                    }
+
+                    String safeFilename = UUID.randomUUID() + extension;
+                    Path filePath = Paths.get(uploadDir, safeFilename);
+                    Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                    ProductImage imageEntity = new ProductImage();
+                    imageEntity.setUrl(domainUrl + "/uploads/" + safeFilename);
+                    imageEntity.setProduct(product);
+                    imageEntities.add(imageEntity);
+
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to save image", e);
+                }
+            }
+        }
+
+        return imageEntities;
     }
 
 }
