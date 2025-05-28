@@ -2,10 +2,12 @@ package com.huynhntp.commons.wear2ndchange.controller;
 
 import com.huynhntp.commons.wear2ndchange.model.dto.*;
 import com.huynhntp.commons.wear2ndchange.service.*;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 
 @RestController
@@ -24,5 +26,17 @@ public class AccountController {
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         accountService.changePassword(request);
         return ResponseEntity.ok("Password changed successfully");
+    }
+
+    @PutMapping()
+    public ResponseEntity<?> updateAccount(@RequestBody UpdateAccountForm form) {
+        accountService.updateAccount(form);
+        return ResponseEntity.ok("Account updated successfully");
+    }
+
+    @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadAvatar(@RequestParam("avatar") MultipartFile avatarFile) {
+        String avatarUrl = accountService.uploadAvatar(avatarFile);
+        return ResponseEntity.ok(Map.of("avatarUrl", avatarUrl));
     }
 }

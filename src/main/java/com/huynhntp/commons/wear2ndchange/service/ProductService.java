@@ -1,5 +1,6 @@
 package com.huynhntp.commons.wear2ndchange.service;
 
+import com.huynhntp.commons.wear2ndchange.config.exception.AccessDeniedException;
 import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
 import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
 import com.huynhntp.commons.wear2ndchange.mapper.ProductMapper;
@@ -21,7 +22,6 @@ import java.util.*;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
     private final AuthService authService;
     private final AccountRepository accountRepository;
     private final ProductImageRepository productImageRepository;
@@ -96,6 +96,27 @@ public class ProductService {
 
         return new PageImpl<>(productDTOS, pageable, products.getTotalElements());
     }
+
+    @Transactional
+    public void deleteProduct(Long productId) {
+        Long userId = authService.getUserId();
+        Account currentUser = accountRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("Account not found"));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BusinessException("Product not found"));
+
+        boolean isAdmin = currentUser.getRole().equalsIgnoreCase("ADMIN");
+
+        boolean isOwner = product.getCreateBy().getId().equals(currentUser.getId());
+
+        if (!isOwner && !isAdmin) {
+            throw new AccessDeniedException("You are not allowed to delete this product.");
+        }
+
+        productRepository.delete(product);
+    }
+
 
 
     private List<ProductImage> saveImages(MultipartFile[] images, Product product, String uploadDir, String domainUrl) {

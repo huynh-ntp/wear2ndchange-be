@@ -43,4 +43,10 @@ public class ProductController {
         return productService.getProducts(name, category, pageable);
     }
 
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.ok("Product deleted successfully.");
+    }
+
 }

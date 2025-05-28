@@ -1,6 +1,7 @@
 package com.huynhntp.commons.wear2ndchange.service;
 
-import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
+import com.huynhntp.commons.wear2ndchange.config.exception.*;
+import com.huynhntp.commons.wear2ndchange.config.exception.AccessDeniedException;
 import com.huynhntp.commons.wear2ndchange.mapper.AccountMapper;
 import com.huynhntp.commons.wear2ndchange.model.dto.*;
 import com.huynhntp.commons.wear2ndchange.model.entity.Account;
@@ -9,6 +10,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
 
 @Service
@@ -40,4 +46,64 @@ public class AccountService {
         account.setPassword(passwordEncoder.encode(request.getNewPassword()));
         accountRepository.save(account);
     }
+
+    @Transactional
+    public void updateAccount(UpdateAccountForm form) {
+        Long currentUserId = authService.getUserId();
+
+        if (!currentUserId.equals(form.getId())) {
+            throw new AccessDeniedException("You can only update your own account.");
+        }
+
+        Account account = accountRepository.findById(currentUserId)
+                .orElseThrow(() -> new BusinessException("Account not found"));
+
+        account.setFullName(form.getFullName());
+        account.setPhoneNumber(form.getPhoneNumber());
+        account.setEmail(form.getEmail());
+        account.setAvatarUrl(form.getAvatarUrl());
+
+        accountRepository.save(account);
+    }
+
+    @Transactional
+    public String uploadAvatar(MultipartFile avatarFile) {
+        if (avatarFile.isEmpty()) {
+            throw new BusinessException("Avatar file is empty");
+        }
+
+        Long userId = authService.getUserId();
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("Account not found"));
+
+        try {
+            String uploadDir = "/home/ubuntu/uploads/";
+            File dir = new File(uploadDir);
+            if (!dir.exists() && !dir.mkdirs()) {
+                throw new RuntimeException("Could not create upload directory");
+            }
+
+            String originalFilename = Paths.get(Objects.requireNonNull(avatarFile.getOriginalFilename())).getFileName().toString();
+            String extension = "";
+            int dotIndex = originalFilename.lastIndexOf('.');
+            if (dotIndex >= 0) {
+                extension = originalFilename.substring(dotIndex);
+            }
+
+            String safeFilename = UUID.randomUUID() + extension;
+            Path filePath = Paths.get(uploadDir, safeFilename);
+            Files.copy(avatarFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            String avatarUrl = "http://45.119.82.37:8080/uploads/" + safeFilename;
+            account.setAvatarUrl(avatarUrl);
+            accountRepository.save(account);
+
+            return avatarUrl;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload avatar", e);
+        }
+    }
+
 }
+

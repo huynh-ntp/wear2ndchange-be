@@ -34,6 +34,8 @@ public class Account  implements MsgUser {
 
     private String fullName;
 
+    private String avatarUrl;
+
     @Column(unique = true, nullable = false)
     private String email;
 
