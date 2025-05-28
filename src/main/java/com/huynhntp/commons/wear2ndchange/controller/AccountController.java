@@ -39,4 +39,11 @@ public class AccountController {
         String avatarUrl = accountService.uploadAvatar(avatarFile);
         return ResponseEntity.ok(Map.of("avatarUrl", avatarUrl));
     }
+
+    @PutMapping("/preference")
+    public ResponseEntity<?> updatePreference(@RequestParam Map<String, String> preferenceParams) {
+        accountService.updatePreference(preferenceParams);
+        return ResponseEntity.ok("Preference updated successfully");
+    }
+
 }

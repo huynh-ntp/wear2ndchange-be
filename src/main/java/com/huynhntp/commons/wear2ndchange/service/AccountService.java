@@ -101,5 +101,16 @@ public class AccountService {
         }
     }
 
+    @Transactional
+    public void updatePreference(Map<String, String> preferenceParams) {
+        Long userId = authService.getUserId();
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("Account not found"));
+
+        Map<String, Object> preference = new HashMap<>(preferenceParams);
+        account.setPreference(preference);
+
+        accountRepository.save(account);
+    }
 }
 

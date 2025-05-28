@@ -8,20 +8,23 @@ import com.huynhntp.commons.wear2ndchange.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 public class CartService {
+
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final AuthService authService;
     private final ProductMapper productMapper;
+    private final AccountRepository accountRepository;
 
     public void addToCart(CartForm form) {
         Long userId = authService.getUserId();
-
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("Account not found"));
         Product product = productRepository.findById(form.getProductId())
                 .orElseThrow(() -> new BusinessException("Product not found"));
 
@@ -30,13 +33,38 @@ public class CartService {
 
         cartItem.setUserId(userId);
         cartItem.setProduct(product);
-
         cartRepository.save(cartItem);
+
+        int cartCount = cartRepository.countByUserId(userId);
+
+        Map<String, Object> preference = account.getPreference();
+        if (preference == null) {
+            preference = new HashMap<>();
+        }
+        preference.put("cart_number", cartCount);
+        account.setPreference(preference);
+        accountRepository.save(account);
     }
 
 
     public void deleteCartItem(Long cartItemId) {
         cartRepository.deleteById(cartItemId);
+
+        Long userId = authService.getUserId();
+
+        int cartCount = cartRepository.countByUserId(userId);
+
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("Account not found"));
+
+        Map<String, Object> preference = account.getPreference();
+        if (preference == null) {
+            preference = new HashMap<>();
+        }
+        preference.put("cart_number", cartCount);
+        account.setPreference(preference);
+
+        accountRepository.save(account);
     }
 
     public List<CartDTO> viewCart() {
