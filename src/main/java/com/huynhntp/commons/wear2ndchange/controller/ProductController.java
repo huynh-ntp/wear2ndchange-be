@@ -15,16 +15,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-//@RequestMapping("/api/product")
+@RequestMapping("/api/product")
 @AllArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
-    private static final String privateRoot = "/api/product";
-    private static final String publicRoot = "/public/api/product";
 
     @SneakyThrows
-    @PostMapping(privateRoot)
+    @PostMapping()
     public ResponseEntity<?> createProduct(
             @RequestParam("productForm") String productFormStr,
             @RequestParam("images") MultipartFile[] images) {
@@ -37,7 +35,7 @@ public class ProductController {
         return ResponseEntity.ok("Đăng bán thành công.");
     }
 
-    @PutMapping(privateRoot)
+    @PutMapping()
     @SneakyThrows
     public ResponseEntity<?> updateProduct(
             @RequestParam("productId") Long productId,
@@ -51,7 +49,7 @@ public class ProductController {
         return ResponseEntity.ok("saved successfully");
     }
 
-    @GetMapping(value = publicRoot)
+    @GetMapping()
     public Page<ProductDTO> getAllProducts(@RequestParam(required = false) String name,
                                            @RequestParam(required = false) String category,
                                            @RequestParam(required = false) String status,
@@ -60,13 +58,13 @@ public class ProductController {
                 CategoryEnum.parseStringToEnum(category) : null, status, pageable);
     }
 
-    @GetMapping(publicRoot + "/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         ProductDTO product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
 
-    @DeleteMapping(privateRoot + "{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.ok("Product deleted successfully.");

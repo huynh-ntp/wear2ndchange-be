@@ -4,6 +4,7 @@ import com.huynhntp.commons.wear2ndchange.config.jwt.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -35,6 +36,7 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/api/product").permitAll()
                         .requestMatchers("/public/**", "/api/auth/register", "/api/auth/login",
                                 "api/auth/forgot-password", "api/auth/reset-password", "/uploads/**").permitAll()
                         .anyRequest().authenticated()
