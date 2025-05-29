@@ -93,7 +93,6 @@ public class ProductService {
         productRepository.save(product);
     }
 
-
     @Transactional(readOnly = true)
     public Page<ProductDTO> getProducts(String name, CategoryEnum category, Pageable pageable) {
         String categoryStr = category != null ? category.name() : null;
