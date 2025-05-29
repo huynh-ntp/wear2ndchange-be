@@ -27,6 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,6 +54,8 @@ public class ProductService {
                 .setName(productForm.getName())
                 .setSize(productForm.getSize())
                 .setMaterial(productForm.getMaterial())
+                .setStatus("ACTIVE")
+                .setCreatedDateTime(LocalDateTime.now())
                 .setPrice(productForm.getPrice())
                 .setPercentage(productForm.getPercentage())
                 .setCategory(CategoryEnum.parseStringToEnum(productForm.getCategory()))

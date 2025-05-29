@@ -4,11 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
-import com.huynhntp.commons.wear2ndchange.model.dto.*;
+import com.huynhntp.commons.wear2ndchange.model.dto.ProductDTO;
+import com.huynhntp.commons.wear2ndchange.model.dto.ProductForm;
 import com.huynhntp.commons.wear2ndchange.service.ProductService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.*;
-import org.springframework.http.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,9 +47,9 @@ public class ProductController {
 
     @GetMapping
     public Page<ProductDTO> getAllProducts(@RequestParam(required = false) String name,
-                                           @RequestParam(required = false) CategoryEnum category,
+                                           @RequestParam(required = false) String category,
                                            Pageable pageable) {
-        return productService.getProducts(name, category, pageable);
+        return productService.getProducts(name, category != null ? CategoryEnum.parseStringToEnum(category) : null, pageable);
     }
 
     @GetMapping("/{id}")

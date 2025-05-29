@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +39,8 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     private CategoryEnum category;
+
+    private LocalDateTime createdDateTime;
 
     private void updateSearchText() {
         if (name != null && !name.isEmpty()) {
