@@ -27,9 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -94,9 +92,8 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductDTO> getProducts(String name, CategoryEnum category, Pageable pageable) {
-        String categoryStr = category != null ? category.name() : null;
-        Page<Product> products = productRepository.searchByNameAndCategory(name, categoryStr, pageable);
+    public Page<ProductDTO> getProducts(String name, CategoryEnum category, String status, Pageable pageable) {
+        Page<Product> products = productRepository.searchByNameAndStatusAndCategory(name, status, category, pageable);
 
         List<ProductDTO> productDTOS = new ArrayList<>();
         products.forEach(product -> {
