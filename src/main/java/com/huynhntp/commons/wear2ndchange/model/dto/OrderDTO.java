@@ -10,4 +10,12 @@ public class OrderDTO {
     private Long id;
     private LocalDateTime createdAt;
     private List<OrderItemDTO> items;
+
+    public Long getTotalPrice() {
+        Long totalPrice = 0L;
+        for (OrderItemDTO item : items) {
+            totalPrice += item.getProduct().getPrice();
+        }
+        return totalPrice;
+    }
 }
