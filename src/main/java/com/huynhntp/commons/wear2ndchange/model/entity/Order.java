@@ -29,4 +29,6 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<OrderItem> items = new ArrayList<>();
+
+    private String status;
 }

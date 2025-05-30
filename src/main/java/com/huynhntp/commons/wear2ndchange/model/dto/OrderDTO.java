@@ -10,6 +10,7 @@ public class OrderDTO {
     private Long id;
     private LocalDateTime createdAt;
     private List<OrderItemDTO> items;
+    private String status;
 
     public Long getTotalPrice() {
         Long totalPrice = 0L;

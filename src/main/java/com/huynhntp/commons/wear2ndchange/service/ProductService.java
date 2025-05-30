@@ -180,12 +180,11 @@ public class ProductService {
     }
 
     @Transactional
-    public void changeProductStatus(Long productId, ProductStatusEnum newStatus) {
+    public void changeProductStatus(Long productId, ProductAndOrderStatusEnum newStatus) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException("Product not found"));
 
         product.setStatus(newStatus.toString());
         productRepository.save(product);
     }
-
 }

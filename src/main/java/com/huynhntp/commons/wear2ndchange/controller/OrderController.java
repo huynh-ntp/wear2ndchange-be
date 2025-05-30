@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/order")
@@ -20,12 +20,26 @@ public class OrderController {
     private final AuthService authService;
 
     @PostMapping
-    public ResponseEntity<?> placeOrder() {
-        List<Cart> cartItems = cartRepository.findByUserId(authService.getUserId());
-        orderService.createOrderFromCart(cartItems);
+    public ResponseEntity<?> placeOrder(@RequestParam List<Long> cartItemIds) {
+        List<Cart> selectedItems = cartRepository.findAllById(cartItemIds).stream()
+                .filter(cart -> cart.getUserId().equals(authService.getUserId()))
+                .toList();
 
-        cartRepository.deleteAll(cartItems);
+        if (selectedItems.isEmpty()) {
+            return ResponseEntity.badRequest().body("Không có sản phẩm hợp lệ để đặt hàng.");
+        }
+        orderService.createOrderFromCart(selectedItems);
+
+        cartRepository.deleteAll(selectedItems);
 
         return ResponseEntity.ok("Đặt hàng thành công!");
+    }
+
+    @PutMapping
+    public ResponseEntity<?> changeStatus(@RequestParam Long id,
+                                          @RequestParam String action) {
+        orderService.changeOrderStatus(id, action);
+
+        return ResponseEntity.ok(Map.of("message", "Order status updated"));
     }
 }

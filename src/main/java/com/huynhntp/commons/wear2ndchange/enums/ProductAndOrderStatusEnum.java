@@ -1,8 +1,10 @@
 package com.huynhntp.commons.wear2ndchange.enums;
 
-public enum ProductStatusEnum {
+public enum ProductAndOrderStatusEnum {
     ACTIVE,
     SOLD_OUT,
+    CREATED,
     DELIVERING,
-    DELIVERED;
+    CANCELLED,
+    RECEIVED;
 }

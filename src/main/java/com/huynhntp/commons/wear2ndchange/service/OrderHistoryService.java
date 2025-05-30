@@ -34,7 +34,7 @@ public class OrderHistoryService {
 
                 return itemDTO;
             }).collect(Collectors.toList());
-
+            dto.setStatus(order.getStatus());
             dto.setItems(itemDTOs);
             return dto;
         }).collect(Collectors.toList());
