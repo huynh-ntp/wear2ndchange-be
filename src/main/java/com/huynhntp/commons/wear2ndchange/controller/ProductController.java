@@ -59,7 +59,7 @@ public class ProductController {
                 CategoryEnum.parseStringToEnum(category) : null, status, pageable);
     }
 
-    @PatchMapping("/products/{id}/status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<?> changeStatus(@PathVariable Long id,
                                           @RequestBody ChangeProductStatusForm changeProductStatusForm) {
         productService.changeProductStatus(id, changeProductStatusForm.getStatus());
