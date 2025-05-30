@@ -51,10 +51,6 @@ public class AccountService {
     public void updateAccount(UpdateAccountForm form) {
         Long currentUserId = authService.getUserId();
 
-        if (!currentUserId.equals(form.getId())) {
-            throw new AccessDeniedException("You can only update your own account.");
-        }
-
         Account account = accountRepository.findById(currentUserId)
                 .orElseThrow(() -> new BusinessException("Account not found"));
 

@@ -20,7 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
                 registry.addMapping("/**")
                         .allowedOriginPatterns(
                                 "https://wear2ndchange-fe.vercel.app",
-                                "http://localhost:3000"
+                                "http://localhost:3000",
+                                "http://45.119.82.37:81"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                         .allowedHeaders("*")
