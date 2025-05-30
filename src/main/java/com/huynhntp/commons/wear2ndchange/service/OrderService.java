@@ -1,6 +1,7 @@
 package com.huynhntp.commons.wear2ndchange.service;
 
 import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
+import com.huynhntp.commons.wear2ndchange.enums.ProductStatusEnum;
 import com.huynhntp.commons.wear2ndchange.model.entity.*;
 import com.huynhntp.commons.wear2ndchange.repository.*;
 import lombok.AllArgsConstructor;
@@ -43,7 +44,7 @@ public class OrderService {
 
             items.add(item);
             totalAmount += product.getPrice();
-            product.setStatus("SOLD_OUT");
+            product.setStatus(ProductStatusEnum.DELIVERING.toString());
             productRepository.save(product);
         }
 

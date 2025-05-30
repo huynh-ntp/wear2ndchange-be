@@ -2,7 +2,7 @@ package com.huynhntp.commons.wear2ndchange.service;
 
 import com.huynhntp.commons.wear2ndchange.config.exception.AccessDeniedException;
 import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
-import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
+import com.huynhntp.commons.wear2ndchange.enums.*;
 import com.huynhntp.commons.wear2ndchange.mapper.ProductMapper;
 import com.huynhntp.commons.wear2ndchange.model.dto.ProductDTO;
 import com.huynhntp.commons.wear2ndchange.model.dto.ProductForm;
@@ -177,6 +177,15 @@ public class ProductService {
         }
 
         return imageEntities;
+    }
+
+    @Transactional
+    public void changeProductStatus(Long productId, ProductStatusEnum newStatus) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BusinessException("Product not found"));
+
+        product.setStatus(newStatus.toString());
+        productRepository.save(product);
     }
 
 }
