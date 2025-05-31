@@ -29,4 +29,9 @@ public class CartController {
     public ResponseEntity<?> viewCart() {
         return ResponseEntity.ok(cartService.viewCart());
     }
+
+    @GetMapping("/countCart")
+    public ResponseEntity<?> countCart() {
+        return ResponseEntity.ok(cartService.countCart());
+    }
 }

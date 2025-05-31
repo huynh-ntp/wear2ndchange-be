@@ -37,6 +37,8 @@ public class Product {
 
     private String searchText;
 
+    private String description;
+
     @Enumerated(EnumType.STRING)
     private CategoryEnum category;
 

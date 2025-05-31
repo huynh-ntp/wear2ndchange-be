@@ -37,6 +37,7 @@ public class GlobalExceptionHandler {
                 request.getRequestURI(),
                 LocalDateTime.now()
         );
+        ex.printStackTrace();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }

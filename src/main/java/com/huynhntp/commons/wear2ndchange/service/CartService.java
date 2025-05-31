@@ -82,4 +82,10 @@ public class CartService {
                 })
                 .collect(Collectors.toList());
     }
+
+    public Integer countCart() {
+        Long userId = authService.getUserId();
+        List<Cart> cartItems = cartRepository.findByUserId(userId);
+        return cartItems.size();
+    }
 }
