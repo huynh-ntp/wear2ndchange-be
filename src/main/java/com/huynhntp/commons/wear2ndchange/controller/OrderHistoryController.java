@@ -2,7 +2,6 @@ package com.huynhntp.commons.wear2ndchange.controller;
 
 
 import com.huynhntp.commons.wear2ndchange.model.dto.OrderDTO;
-import com.huynhntp.commons.wear2ndchange.model.entity.*;
 import com.huynhntp.commons.wear2ndchange.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

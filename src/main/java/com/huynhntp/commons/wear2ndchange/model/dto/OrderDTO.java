@@ -11,6 +11,7 @@ public class OrderDTO {
     private LocalDateTime createdAt;
     private List<OrderItemDTO> items;
     private String status;
+    private AccountDTO user;
 
     public Long getTotalPrice() {
         Long totalPrice = 0L;
