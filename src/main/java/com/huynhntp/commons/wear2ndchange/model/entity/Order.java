@@ -31,4 +31,10 @@ public class Order {
     private List<OrderItem> items = new ArrayList<>();
 
     private String status;
+
+    private String receiver;
+    private String phoneNumber;
+    private String address;
+    private String note;
+    private String email;
 }

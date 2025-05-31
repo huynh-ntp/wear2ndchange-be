@@ -3,7 +3,7 @@ package com.huynhntp.commons.wear2ndchange.enums;
 public enum ProductAndOrderStatusEnum {
     ACTIVE,
     SOLD_OUT,
-    CREATED,
+    INIT,
     DELIVERING,
     CANCELLED,
     RECEIVED;
