@@ -3,14 +3,12 @@ package com.huynhntp.commons.wear2ndchange.controller;
 
 import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
 import com.huynhntp.commons.wear2ndchange.model.dto.OrderRequestDto;
-import com.huynhntp.commons.wear2ndchange.model.dto.OrderResponseDto;
-import com.huynhntp.commons.wear2ndchange.model.entity.Cart;
+import com.huynhntp.commons.wear2ndchange.model.entity.*;
 import com.huynhntp.commons.wear2ndchange.repository.CartRepository;
 import com.huynhntp.commons.wear2ndchange.service.AuthService;
 import com.huynhntp.commons.wear2ndchange.service.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,10 +50,23 @@ public class OrderController {
         return ResponseEntity.ok(Map.of("message", "Order status updated"));
     }
 
-    @GetMapping("/owner")
-    public ResponseEntity<?> getOrders() {
-        List<OrderResponseDto> orders = orderService.getOrderByOwner();
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<List<Order>> getAllOrders() {
+        List<Order> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+        return orderService.getOrderById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<Order>> getMyOrders() {
+        List<Order> myOrders = orderService.getOrdersByUserId(authService.getUserId());
+        return ResponseEntity.ok(myOrders);
     }
 
 }
