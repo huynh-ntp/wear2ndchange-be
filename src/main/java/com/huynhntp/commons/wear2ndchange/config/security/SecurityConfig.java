@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/product","/api/product/**").permitAll()
                         .requestMatchers("/public/**", "/api/auth/register", "/api/auth/login",
-                                "api/auth/forgot-password", "api/auth/reset-password", "/uploads/**").permitAll()
+                                "api/auth/forgot-password", "api/auth/reset-password", "/uploads/**", "/ws-chat/**", "/app/**", "/topic/**", "/queue/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(httpBasic -> {
