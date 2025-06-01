@@ -1,8 +1,10 @@
 package com.huynhntp.commons.wear2ndchange.controller;
 
 import com.huynhntp.commons.wear2ndchange.model.dto.*;
+import com.huynhntp.commons.wear2ndchange.model.entity.Account;
 import com.huynhntp.commons.wear2ndchange.service.*;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +18,7 @@ import java.util.Map;
 public class AccountController {
 
     private final AccountService accountService;
+    private final AuthService authService;
 
     @GetMapping("/profile")
     public AccountDTO resetPassword(@RequestParam Long userId) {
@@ -46,4 +49,23 @@ public class AccountController {
         return ResponseEntity.ok("Preference updated successfully");
     }
 
+
+    @GetMapping
+    public ResponseEntity<Page<Account>> getAllUsers(Pageable pageable) {
+        Page<Account> users = accountService.getAllUsers(pageable);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Account> getUserDetail(@PathVariable Long id) {
+        return accountService.getUserById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}/deactivate")
+    public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
+        accountService.deactivateUser(id);
+        return ResponseEntity.ok("Khoá người dùng thành công!");
+    }
 }

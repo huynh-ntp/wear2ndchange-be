@@ -1,7 +1,7 @@
 package com.huynhntp.commons.wear2ndchange.service;
 
 import com.huynhntp.commons.wear2ndchange.common.PasswordGenerator;
-import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
+import com.huynhntp.commons.wear2ndchange.config.exception.*;
 import com.huynhntp.commons.wear2ndchange.config.jwt.JwtUtils;
 import com.huynhntp.commons.wear2ndchange.config.jwt.TokenBlacklist;
 import com.huynhntp.commons.wear2ndchange.config.security.UserDetails;
@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +84,14 @@ public class AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        Optional<Account> byId = accountRepository.findById(userDetails.getUserId());
+
+        Account account = byId.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if ("INACTIVE".equals(account.getStatus())) {
+            throw new AccessDeniedException("Tài khoản của bạn đã bị khoá");
+        }
 
         String jwt = jwtUtils.generateToken(userDetails);
 

@@ -9,6 +9,7 @@ import com.huynhntp.commons.wear2ndchange.service.AuthService;
 import com.huynhntp.commons.wear2ndchange.service.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,8 +52,8 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        List<Order> orders = orderService.getAllOrders();
+    public ResponseEntity<Page<Order>> getAllOrders(Pageable pageable) {
+        Page<Order> orders = orderService.getAllOrders(pageable);
         return ResponseEntity.ok(orders);
     }
 
@@ -64,9 +65,8 @@ public class OrderController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<Order>> getMyOrders() {
-        List<Order> myOrders = orderService.getOrdersByUserId(authService.getUserId());
+    public ResponseEntity<Page<Order>> getMyOrders(Pageable pageable) {
+        Page<Order> myOrders = orderService.getOrdersByUserId(authService.getUserId(), pageable);
         return ResponseEntity.ok(myOrders);
     }
-
 }

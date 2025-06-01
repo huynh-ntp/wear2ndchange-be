@@ -1,6 +1,7 @@
 package com.huynhntp.commons.wear2ndchange.repository;
 
 import com.huynhntp.commons.wear2ndchange.model.entity.Order;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
@@ -10,7 +11,7 @@ import java.util.*;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserIdOrderByCreatedAtDesc(Long userId);
 
-    List<Order> findByUserId(Long userId);
+    Page<Order> findByUserId(Long userId, Pageable pageable);
 
     Integer countByStatus(String status);
 

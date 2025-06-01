@@ -7,6 +7,7 @@ import com.huynhntp.commons.wear2ndchange.model.dto.*;
 import com.huynhntp.commons.wear2ndchange.model.entity.Account;
 import com.huynhntp.commons.wear2ndchange.repository.AccountRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,6 +108,24 @@ public class AccountService {
         account.setPreference(preference);
 
         accountRepository.save(account);
+    }
+
+    public Page<Account> getAllUsers(Pageable pageable) {
+        return accountRepository.findByRole("USER", pageable);
+    }
+
+    public Optional<Account> getUserById(Long id) {
+        return accountRepository.findById(id);
+    }
+
+    @Transactional
+    public void deactivateUser(Long id) {
+        Optional<Account> accountOpt = accountRepository.findById(id);
+        if (accountOpt.isPresent()) {
+            Account account = accountOpt.get();
+            account.setStatus("INACTIVE");
+            accountRepository.save(account);
+        }
     }
 }
 

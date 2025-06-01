@@ -11,6 +11,7 @@ import com.huynhntp.commons.wear2ndchange.model.entity.Product;
 import com.huynhntp.commons.wear2ndchange.repository.OrderRepository;
 import com.huynhntp.commons.wear2ndchange.repository.ProductRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,15 +111,15 @@ public class OrderService {
     }
 
 
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public Page<Order> getAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable);
     }
 
     public Optional<Order> getOrderById(Long id) {
         return orderRepository.findById(id);
     }
 
-    public List<Order> getOrdersByUserId(Long userId) {
-        return orderRepository.findByUserId(userId);
+    public Page<Order> getOrdersByUserId(Long userId, Pageable pageable) {
+        return orderRepository.findByUserId(userId, pageable);
     }
 }
