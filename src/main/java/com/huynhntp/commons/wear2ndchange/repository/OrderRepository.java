@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findByUserIdOrderByCreatedAtDesc(Long userId);
+    Page<Order> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+
+    Page<Order> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     Page<Order> findByUserId(Long userId, Pageable pageable);
 

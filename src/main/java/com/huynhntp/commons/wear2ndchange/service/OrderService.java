@@ -92,25 +92,6 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public List<OrderResponseDto> getOrderByOwner() {
-        Long userId = authService.getUserId();
-        List<Order> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
-        List<OrderResponseDto> orderResponseDtos = new ArrayList<>();
-        for (Order order : orders) {
-            OrderResponseDto orderResponseDto = new OrderResponseDto();
-            orderResponseDto.setId(order.getId());
-            orderResponseDto.setAddress(order.getAddress());
-            orderResponseDto.setReceiver(order.getReceiver());
-            orderResponseDto.setPhoneNumber(order.getPhoneNumber());
-            orderResponseDto.setEmail(order.getEmail());
-            orderResponseDto.setNote(order.getNote());
-            orderResponseDto.setStatus(order.getStatus());
-            orderResponseDtos.add(orderResponseDto);
-        }
-        return orderResponseDtos;
-    }
-
-
     public Page<Order> getAllOrders(Pageable pageable) {
         return orderRepository.findAll(pageable);
     }
