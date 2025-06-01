@@ -148,7 +148,7 @@ public class ProductService {
         if (!dir.exists() && !dir.mkdirs()) {
             throw new RuntimeException("Could not create upload directory");
         }
-
+        
         for (MultipartFile image : images) {
             if (!image.isEmpty()) {
                 try {
