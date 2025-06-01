@@ -2,6 +2,8 @@ package com.huynhntp.commons.wear2ndchange.service;
 
 import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
 import com.huynhntp.commons.wear2ndchange.enums.ProductAndOrderStatusEnum;
+import com.huynhntp.commons.wear2ndchange.mapper.ProductMapper;
+import com.huynhntp.commons.wear2ndchange.model.dto.OrderItemDTO;
 import com.huynhntp.commons.wear2ndchange.model.dto.OrderRequestDto;
 import com.huynhntp.commons.wear2ndchange.model.dto.OrderResponseDto;
 import com.huynhntp.commons.wear2ndchange.model.entity.Cart;
@@ -11,11 +13,13 @@ import com.huynhntp.commons.wear2ndchange.model.entity.Product;
 import com.huynhntp.commons.wear2ndchange.repository.OrderRepository;
 import com.huynhntp.commons.wear2ndchange.repository.ProductRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -24,6 +28,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final AuthService authService;
     private final OrderRepository orderRepository;
+    private final ProductMapper productMapper;
 
     @Transactional
     public void createOrderFromCart(List<Cart> cartItems, OrderRequestDto orderRequestDto) {
@@ -96,8 +101,33 @@ public class OrderService {
         return orderRepository.findAll(pageable);
     }
 
-    public Optional<Order> getOrderById(Long id) {
-        return orderRepository.findById(id);
+    public OrderResponseDto getOrderById(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Không tìm thấy đơn hàng"));
+        OrderResponseDto orderResponseDto = new OrderResponseDto();
+        orderResponseDto.setId(order.getId());
+        orderResponseDto.setAddress(order.getAddress());
+        orderResponseDto.setReceiver(order.getReceiver());
+        orderResponseDto.setPhoneNumber(order.getPhoneNumber());
+        orderResponseDto.setEmail(order.getEmail());
+        orderResponseDto.setNote(order.getNote());
+        orderResponseDto.setStatus(order.getStatus());
+        orderResponseDto.setTotalAmount(order.getTotalAmount())
+                .setUserId(order.getUserId());
+
+        List<Product> orderItems = order.getItems()
+                .stream().map(OrderItem::getProduct)
+                .toList();
+
+        List<OrderItemDTO> orderItemDTOS = new ArrayList<>();
+        for (Product orderItem : orderItems) {
+            OrderItemDTO orderItemDTO = new OrderItemDTO();
+            orderItemDTO.setProduct(productMapper.toDto(orderItem));
+            orderItemDTOS.add(orderItemDTO);
+        }
+
+
+        return orderResponseDto.setItems(orderItemDTOS);
     }
 
     public Page<Order> getOrdersByUserId(Long userId, Pageable pageable) {

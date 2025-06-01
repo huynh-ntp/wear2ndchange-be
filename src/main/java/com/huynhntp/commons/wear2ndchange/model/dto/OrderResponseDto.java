@@ -1,11 +1,13 @@
 package com.huynhntp.commons.wear2ndchange.model.dto;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@Accessors(chain = true)
 public class OrderResponseDto {
 
     private Long id;
@@ -25,6 +27,8 @@ public class OrderResponseDto {
     private String address;
     private String note;
     private String email;
+
+
 }
 
 

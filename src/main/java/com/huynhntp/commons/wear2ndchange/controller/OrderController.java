@@ -10,6 +10,7 @@ import com.huynhntp.commons.wear2ndchange.service.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,10 +59,10 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
-        return orderService.getOrderById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @SneakyThrows
+    public ResponseEntity<?> getOrderById(@PathVariable Long id) {
+        return new ResponseEntity<>(orderService.getOrderById(id), HttpStatus.OK);
+
     }
 
     @GetMapping("/my")
