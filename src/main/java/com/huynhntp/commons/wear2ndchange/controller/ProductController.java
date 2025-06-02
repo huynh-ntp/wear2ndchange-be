@@ -3,7 +3,8 @@ package com.huynhntp.commons.wear2ndchange.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
-import com.huynhntp.commons.wear2ndchange.model.dto.*;
+import com.huynhntp.commons.wear2ndchange.model.dto.ProductDTO;
+import com.huynhntp.commons.wear2ndchange.model.dto.ProductForm;
 import com.huynhntp.commons.wear2ndchange.service.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -12,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/product")
@@ -41,7 +40,7 @@ public class ProductController {
     public ResponseEntity<?> updateProduct(
             @RequestParam("productId") Long productId,
             @RequestParam("productForm") String productFormStr,
-            @RequestParam(value = "images",required = false) MultipartFile[] images) {
+            @RequestParam(value = "images", required = false) MultipartFile[] images) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         ProductForm productForm = mapper.readValue(productFormStr, ProductForm.class);
@@ -59,14 +58,6 @@ public class ProductController {
                 CategoryEnum.parseStringToEnum(category) : null, status, pageable);
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<?> changeStatus(@PathVariable Long id,
-                                          @RequestBody ChangeProductStatusForm changeProductStatusForm) {
-        productService.changeProductStatus(id, changeProductStatusForm.getStatus());
-        return ResponseEntity.ok(Map.of("message", "Product status updated"));
-    }
-
-
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         ProductDTO product = productService.getProductById(id);
@@ -78,4 +69,12 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.ok("Product deleted successfully.");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> changeStatus(@PathVariable Long id,
+                                          @RequestParam String status) {
+        productService.changeStatus(id, status);
+        return ResponseEntity.ok("Product status changed successfully.");
+    }
+
 }

@@ -2,7 +2,7 @@ package com.huynhntp.commons.wear2ndchange.service;
 
 import com.huynhntp.commons.wear2ndchange.config.exception.AccessDeniedException;
 import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
-import com.huynhntp.commons.wear2ndchange.enums.*;
+import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
 import com.huynhntp.commons.wear2ndchange.mapper.ProductMapper;
 import com.huynhntp.commons.wear2ndchange.model.dto.ProductDTO;
 import com.huynhntp.commons.wear2ndchange.model.dto.ProductForm;
@@ -149,7 +149,7 @@ public class ProductService {
         if (!dir.exists() && !dir.mkdirs()) {
             throw new RuntimeException("Could not create upload directory");
         }
-        
+
         for (MultipartFile image : images) {
             if (!image.isEmpty()) {
                 try {
@@ -180,12 +180,11 @@ public class ProductService {
         return imageEntities;
     }
 
-    @Transactional
-    public void changeProductStatus(Long productId, ProductAndOrderStatusEnum newStatus) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Product not found"));
-
-        product.setStatus(newStatus.toString());
+    public void changeStatus(Long id, String status) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Không tìm thấy sản phẩm #" + id));
+        product.setStatus(status);
         productRepository.save(product);
+
     }
 }
