@@ -41,7 +41,7 @@ public class ProductController {
     public ResponseEntity<?> updateProduct(
             @RequestParam("productId") Long productId,
             @RequestParam("productForm") String productFormStr,
-            @RequestParam("images") MultipartFile[] images) {
+            @RequestParam(value = "images",required = false) MultipartFile[] images) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         ProductForm productForm = mapper.readValue(productFormStr, ProductForm.class);

@@ -81,11 +81,13 @@ public class ProductService {
         String uploadDir = "/home/ubuntu/uploads/";
         String domainUrl = "http://45.119.82.37:8080";
 
-        List<ProductImage> newImageEntities = saveImages(newImages, product, uploadDir, domainUrl);
+        if(newImages!=null && newImages.length>0) {
+            List<ProductImage> newImageEntities = saveImages(newImages, product, uploadDir, domainUrl);
 
-        productImageRepository.flush();
+            productImageRepository.flush();
 
-        product.getImages().addAll(newImageEntities);
+            product.getImages().addAll(newImageEntities);
+        }
 
         productRepository.save(product);
     }
