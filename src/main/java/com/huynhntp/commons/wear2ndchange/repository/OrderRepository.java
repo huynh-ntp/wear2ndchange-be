@@ -20,18 +20,23 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.status = 'RECEIVED' ")
     Double findTotalAmountSince();
 
-    @Query(value = "SELECT EXTRACT(DOW FROM created_at) AS dow, SUM(total_amount) " +
+    @Query(value = "SELECT DATE(created_at) AS date, SUM(total_amount) AS total " +
             "FROM orders " +
-            "WHERE created_at >= :fromTime " +
-            "GROUP BY dow",
+            "WHERE created_at >= :fromTime and status = 'RECEIVED' " +
+            "GROUP BY DATE(created_at) " +
+            "ORDER BY DATE(created_at) " +
+            "LIMIT 7",
             nativeQuery = true)
     List<Object[]> findDailyStats(@Param("fromTime") LocalDateTime fromTime);
 
 
-    @Query("SELECT EXTRACT(MONTH FROM o.createdAt), SUM(o.totalAmount) " +
-            "FROM Order o " +
-            "WHERE o.createdAt >= :fromTime " +
-            "GROUP BY EXTRACT(MONTH FROM o.createdAt)")
+    @Query(value = "SELECT EXTRACT(MONTH FROM created_at) AS month, SUM(total_amount) AS total " +
+            "FROM orders " +
+            "WHERE created_at >= :fromTime and status = 'RECEIVED' " +
+            "GROUP BY EXTRACT(MONTH FROM created_at) " +
+            "ORDER BY month " +
+            "LIMIT 12",
+            nativeQuery = true)
     List<Object[]> findMonthlyStats(@Param("fromTime") LocalDateTime fromTime);
 }
 
