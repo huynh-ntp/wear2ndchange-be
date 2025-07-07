@@ -1,0 +1,22 @@
+package com.huynhntp.commons.wear2ndchange.model.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class RegisterRequest {
+    @NotBlank
+    private String username;
+
+    @NotBlank
+    private String password;
+
+    private String email;
+
+    private String phoneNumber;
+
+    private String fullName;
+
+    @NotBlank
+    private String role;
+}

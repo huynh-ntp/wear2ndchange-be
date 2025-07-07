@@ -1,0 +1,70 @@
+package com.huynhntp.commons.wear2ndchange.model.entity;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.huynhntp.commons.wear2ndchange.common.UtilsService;
+
+import com.huynhntp.commons.wear2ndchange.enums.CategoryEnum;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@Entity
+@Table(name = "product")
+@Accessors(chain = true)
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    private String size;
+
+    private String material;
+
+    private String percentage;
+
+    private String status;
+
+    private Long price;
+
+    private String searchText;
+
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    private CategoryEnum category;
+
+    private LocalDateTime createdDateTime;
+
+    private void updateSearchText() {
+        if (name != null && !name.isEmpty()) {
+            this.searchText = UtilsService.removeAccents(name);
+        }
+    }
+
+    @PrePersist
+    private void prePersist() {
+        updateSearchText();
+    }
+
+    @PreUpdate
+    private void preUpdate() {
+        updateSearchText();
+    }
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account createBy;
+
+}
