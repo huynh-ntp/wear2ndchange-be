@@ -1,0 +1,136 @@
+package com.huynhntp.commons.wear2ndchange.service;
+
+import com.huynhntp.commons.wear2ndchange.config.exception.BusinessException;
+import com.huynhntp.commons.wear2ndchange.enums.ProductAndOrderStatusEnum;
+import com.huynhntp.commons.wear2ndchange.mapper.ProductMapper;
+import com.huynhntp.commons.wear2ndchange.model.dto.OrderItemDTO;
+import com.huynhntp.commons.wear2ndchange.model.dto.OrderRequestDto;
+import com.huynhntp.commons.wear2ndchange.model.dto.OrderResponseDto;
+import com.huynhntp.commons.wear2ndchange.model.entity.Cart;
+import com.huynhntp.commons.wear2ndchange.model.entity.Order;
+import com.huynhntp.commons.wear2ndchange.model.entity.OrderItem;
+import com.huynhntp.commons.wear2ndchange.model.entity.Product;
+import com.huynhntp.commons.wear2ndchange.repository.OrderRepository;
+import com.huynhntp.commons.wear2ndchange.repository.ProductRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@AllArgsConstructor
+public class OrderService {
+
+    private final ProductRepository productRepository;
+    private final AuthService authService;
+    private final OrderRepository orderRepository;
+    private final ProductMapper productMapper;
+
+    @Transactional
+    public Order createOrderFromCart(List<Cart> cartItems, OrderRequestDto orderRequestDto) {
+        Long userId = authService.getUserId();
+
+        Order order = new Order();
+        order.setUserId(userId)
+                .setAddress(orderRequestDto.getAddress())
+                .setReceiver(orderRequestDto.getReceiver())
+                .setPhoneNumber(orderRequestDto.getPhoneNumber())
+                .setEmail(orderRequestDto.getEmail())
+                .setNote(orderRequestDto.getNote());
+
+        List<OrderItem> items = new ArrayList<>();
+        double totalAmount = 0;
+
+        for (Cart cart : cartItems) {
+            Product product = productRepository.findById(cart.getProduct().getId())
+                    .orElseThrow(() -> new BusinessException("Product not found"));
+
+            OrderItem item = new OrderItem();
+            item.setProduct(product);
+            item.setPrice(product.getPrice());
+            item.setTotal(product.getPrice());
+            item.setOrder(order);
+
+            items.add(item);
+            totalAmount += product.getPrice();
+            product.setStatus(ProductAndOrderStatusEnum.SOLD_OUT.toString());
+            productRepository.save(product);
+        }
+
+        order.setItems(items);
+        order.setTotalAmount(totalAmount);
+        order.setStatus(ProductAndOrderStatusEnum.INIT.toString());
+
+        return orderRepository.save(order);
+    }
+
+    @Transactional
+    public void changeOrderStatus(Long orderId, String action) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException("Order not found"));
+
+        for (OrderItem item : order.getItems()) {
+            Long productId = item.getProduct().getId();
+
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new BusinessException("Product not found"));
+
+            switch (action) {
+                case "CANCEL":
+                    product.setStatus(ProductAndOrderStatusEnum.ACTIVE.name());
+                    break;
+                case "DELIVERING", "DELIVERED", "RECEIVED", "INIT", "WAIT_FOR_PAYMENT", "PAID":
+                    product.setStatus(ProductAndOrderStatusEnum.SOLD_OUT.name());
+                    break;
+                default:
+                    throw new BusinessException("Action support: CANCEL or DELIVERING or DELIVERED or RECEIVED or WAIT_FOR_PAYMENT or PAID");
+            }
+
+            productRepository.save(product);
+        }
+
+        order.setStatus(action);
+        orderRepository.save(order);
+    }
+
+    public Page<Order> getAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable);
+    }
+
+    public OrderResponseDto getOrderById(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Không tìm thấy đơn hàng"));
+        OrderResponseDto orderResponseDto = new OrderResponseDto();
+        orderResponseDto.setId(order.getId());
+        orderResponseDto.setAddress(order.getAddress());
+        orderResponseDto.setReceiver(order.getReceiver());
+        orderResponseDto.setPhoneNumber(order.getPhoneNumber());
+        orderResponseDto.setEmail(order.getEmail());
+        orderResponseDto.setNote(order.getNote());
+        orderResponseDto.setStatus(order.getStatus());
+        orderResponseDto.setTotalAmount(order.getTotalAmount())
+                .setUserId(order.getUserId());
+
+        List<Product> orderItems = order.getItems()
+                .stream().map(OrderItem::getProduct)
+                .toList();
+
+        List<OrderItemDTO> orderItemDTOS = new ArrayList<>();
+        for (Product orderItem : orderItems) {
+            OrderItemDTO orderItemDTO = new OrderItemDTO();
+            orderItemDTO.setProduct(productMapper.toDto(orderItem));
+            orderItemDTOS.add(orderItemDTO);
+        }
+
+
+        return orderResponseDto.setItems(orderItemDTOS);
+    }
+
+    public Page<Order> getOrdersByUserId(Long userId, Pageable pageable) {
+        return orderRepository.findByUserId(userId, pageable);
+    }
+}
