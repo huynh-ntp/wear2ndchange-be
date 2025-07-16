@@ -83,11 +83,11 @@ public class OrderService {
                 case "CANCEL":
                     product.setStatus(ProductAndOrderStatusEnum.ACTIVE.name());
                     break;
-                case "DELIVERING", "DELIVERED", "RECEIVED", "INIT", "WAIT_FOR_PAYMENT", "PAID":
+                case "DELIVERING", "DELIVERED", "RECEIVED", "INIT", "WAIT_FOR_PAYMENT", "PAID", "PAID_AND_ON_DELIVERING":
                     product.setStatus(ProductAndOrderStatusEnum.SOLD_OUT.name());
                     break;
                 default:
-                    throw new BusinessException("Action support: CANCEL or DELIVERING or DELIVERED or RECEIVED or WAIT_FOR_PAYMENT or PAID");
+                    throw new BusinessException("Action support: CANCEL, DELIVERING, DELIVERED, RECEIVED, WAIT_FOR_PAYMENT, PAID and PAID_AND_ON_DELIVERING");
             }
 
             productRepository.save(product);
